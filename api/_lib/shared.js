@@ -5,7 +5,7 @@ const BASE_URL = process.env.PROFANUS_BASE_URL || "https://profanuspay.com";
 /* A fonte da verdade dos valores é o servidor: o front só envia o id do frete. */
 const SUBTOTAL = 0;
 const SHIPPING = {
-  pac: { name: "PAC", price: 1.00 },
+  pac: { name: "PAC", price: 22.34 },
   sedex: { name: "SEDEX", price: 26.77 },
   expresso: { name: "SEDEX Expresso", price: 34.81 }
 };

@@ -4,7 +4,7 @@
 var SUBTOTAL = 0;
 
 var SHIPPING_OPTIONS = [
-  { id: "pac", name: "PAC", eta: "4 a 6 dias úteis", price: 1.00, maxDays: 6 },
+  { id: "pac", name: "PAC", eta: "4 a 6 dias úteis", price: 22.34, maxDays: 6 },
   { id: "sedex", name: "SEDEX", eta: "2 a 3 dias úteis", price: 26.77, maxDays: 3 },
   { id: "expresso", name: "SEDEX Expresso", eta: "1 a 2 dias úteis", price: 34.81, maxDays: 2 }
 ];
