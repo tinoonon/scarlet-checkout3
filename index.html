@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout — Kit Aniversário 10 Anos | Scarlet</title>
+  <meta name="description" content="Resgate seu kit de aniversário Scarlet pagando somente o frete. Pagamento 100% seguro via Pix.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@700&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="page">
+  <div id="site-header"></div>
+  <main>
+    <div class="container banner">
+      <img src="img/banner2.jpeg" alt="Resgate seu kit aniversário 10 anos Scarlet pagando somente o frete" width="1920" height="640">
+    </div>
+
+    <form id="checkout-form" class="container layout" novalidate>
+      <div class="stack">
+
+        <section class="card">
+          <h2 class="card-title">1. Dados pessoais</h2>
+          <div class="fields">
+            <div class="field" data-field="name">
+              <label for="name">Nome completo</label>
+              <div class="wrap"><input id="name" name="name" autocomplete="name"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <p class="error" role="alert"></p>
+            </div>
+            <div class="field" data-field="email">
+              <label for="email">E-mail</label>
+              <div class="wrap"><input id="email" name="email" type="email" autocomplete="email"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <p class="error" role="alert"></p>
+            </div>
+            <div class="field" data-field="cpf">
+              <label for="cpf">CPF</label>
+              <div class="wrap"><input id="cpf" name="cpf" inputmode="numeric" placeholder="000.000.000-00"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <p class="error" role="alert"></p>
+            </div>
+            <div>
+              <label for="phone" style="display:block;margin-bottom:6px;font-size:12px;color:oklch(0.129 0.042 264.695 / 80%)">Celular / WhatsApp</label>
+              <div class="phone-row">
+                <button type="button" class="country" aria-label="País: Brasil +55">
+                  <span class="flag"></span>+55
+                  <svg class="icon" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="field" data-field="phone">
+                  <div class="wrap"><input id="phone" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="(00) 00000-0000"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+                  <p class="error" role="alert"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">2. Entrega</h2>
+          <div class="fields">
+            <div class="cep-row" id="cep-row">
+              <div class="field" data-field="cep">
+                <label for="cep">CEP</label>
+                <div class="wrap"><input id="cep" name="cep" inputmode="numeric" placeholder="00000-000"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+                <p class="error" role="alert"></p>
+              </div>
+              <span class="cep-label" id="city-label"></span>
+            </div>
+            <div class="field" data-field="street">
+              <label for="street">Endereço/Rua</label>
+              <div class="wrap"><input id="street" name="street"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+              <p class="error" role="alert"></p>
+            </div>
+            <div class="num-bairro">
+              <div class="field" data-field="number">
+                <label for="number">Número</label>
+                <div class="wrap"><input id="number" name="number" inputmode="numeric"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+                <p class="error" role="alert"></p>
+              </div>
+              <div class="field" data-field="district">
+                <label for="district">Bairro</label>
+                <div class="wrap"><input id="district" name="district"><svg class="icon check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+                <p class="error" role="alert"></p>
+              </div>
+            </div>
+            <div class="field">
+              <div class="wrap"><input id="complement" name="complement" aria-label="Complemento / referência" placeholder="Complemento ou ponto de referência"></div>
+            </div>
+
+            <fieldset class="shipping-box hidden" id="shipping-box" style="margin-inline:0;min-width:0">
+              <legend class="sr-only">Forma de entrega</legend>
+              <p class="shipping-title">Escolha uma forma de entrega:</p>
+              <div class="shipping-list" id="shipping-list"></div>
+            </fieldset>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">3. Pagamento</h2>
+          <div class="pay-box">
+            <span class="pay-badge">Aprovação imediata</span>
+            <div class="pay-method">
+              <span class="radio on"></span>
+              <svg class="pix-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5 21.5 12 12 21.5 2.5 12z" opacity=".25"/><path d="M12 6.2 17.8 12 12 17.8 6.2 12z"/></svg>
+              Pix
+            </div>
+            <div class="pay-body">
+              <p class="t">A confirmação do seu pagamento é mais rápida</p>
+              <p class="d">Após clicar em 'Finalizar compra' você terá 30 minutos para pagar com Pix usando QR Code ou código que será exibido. A confirmação é instantânea.</p>
+              <p class="v" id="pix-value">Valor: R$ 22,34</p>
+            </div>
+            <div class="alert-error hidden" id="pix-error" role="alert" aria-live="assertive">Erro ao gerar pagamento PIX</div>
+            <button type="submit" class="btn btn-primary btn-submit" id="submit-btn">
+              <span id="submit-icon"></span><span id="submit-text">Confirmar compra</span>
+            </button>
+            <p class="terms">Ao confirmar, você concorda com nossos termos de uso e política de privacidade.</p>
+          </div>
+        </section>
+      </div>
+
+      <aside class="aside" id="aside"></aside>
+    </form>
+  </main>
+  <div id="site-counter"></div>
+  <div id="site-footer"></div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/checkout.js"></script>
+</body>
+</html>
