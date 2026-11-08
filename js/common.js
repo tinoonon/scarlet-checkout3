@@ -94,10 +94,22 @@ function apiPost(url, body) {
 
 /* Um id por frete escolhido: se o envio falhar e a pessoa tentar de novo, reaproveita o mesmo
    id e o Profanus devolve a mesma cobrança (idempotência por external_id) em vez de criar outra. */
+/* UTMs: guarda os da URL (primeiro toque é mantido) para enviar junto com o pedido ao Utmify. */
+var TRACK_KEYS = ["src", "sck", "utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term"];
+function getTracking() {
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem("scarlet-utms") || "{}"); } catch (e) {}
+  var q = new URLSearchParams(location.search), changed = false;
+  TRACK_KEYS.forEach(function (k) { if (q.get(k)) { saved[k] = q.get(k); changed = true; } });
+  if (changed) { try { localStorage.setItem("scarlet-utms", JSON.stringify(saved)); } catch (e) {} }
+  return saved;
+}
+getTracking();
+
 var ATTEMPTS = {};
 function createCheckout(customer, shippingId) {
   var id = ATTEMPTS[shippingId] || (ATTEMPTS[shippingId] = "SC-" + randomCode(10));
-  return apiPost("/api/pix-create", { ref: id, shippingId: shippingId }).then(function (r) {
+  return apiPost("/api/pix-create", { ref: id, shippingId: shippingId, customer: customer, tracking: getTracking() }).then(function (r) {
     var order = {
       id: id, ref: id, attempt: 1, customer: customer, shippingId: shippingId, total: r.total,
       pixCode: r.pixCode, createdAt: Date.now(), expiresAt: Date.parse(r.expiresAt)
@@ -114,7 +126,7 @@ function regeneratePix(id) {
   if (!o) return Promise.resolve(null);
   var n = (o.attempt || 1) + 1;
   var ref = o.id + "-" + n;
-  return apiPost("/api/pix-create", { ref: ref, shippingId: o.shippingId }).then(function (r) {
+  return apiPost("/api/pix-create", { ref: ref, shippingId: o.shippingId, customer: o.customer, tracking: getTracking() }).then(function (r) {
     o.ref = ref; o.attempt = n; o.pixCode = r.pixCode;
     o.createdAt = Date.now(); o.expiresAt = Date.parse(r.expiresAt);
     saveOrder(o);
@@ -133,6 +145,9 @@ function getOrderStatus(id) {
       if (j.status === "paid") {
         o.paidAt = j.paidAt ? Date.parse(j.paidAt) : Date.now();
         saveOrder(o);
+        /* Venda paga: o servidor confirma no gateway e avisa o Utmify */
+        fetch("/api/track-paid", { method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+          body: JSON.stringify({ ref: o.ref, shippingId: o.shippingId, customer: o.customer, tracking: getTracking() }) }).catch(function () {});
         return "paid";
       }
       if (j.status === "expired" || j.status === "cancelled") return "expired";

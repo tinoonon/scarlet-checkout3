@@ -1,3 +1,4 @@
+const { sendToUtmify } = require("./_lib/utmify");
 const { SUBTOTAL, SHIPPING, REF_RE, profanus, publicBaseUrl, round2 } = require("./_lib/shared");
 
 /* POST /api/pix-create  { ref, shippingId }  ->  { id, ref, total, pixCode, expiresAt, status } */
@@ -5,7 +6,7 @@ module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") return res.status(405).json({ error: "Método não permitido" });
 
-  const { ref, shippingId } = req.body || {};
+  const { ref, shippingId, customer, tracking } = req.body || {};
   if (typeof ref !== "string" || !REF_RE.test(ref)) return res.status(400).json({ error: "Pedido inválido" });
   const ship = SHIPPING[shippingId];
   if (!ship) return res.status(400).json({ error: "Forma de entrega inválida" });
@@ -45,6 +46,12 @@ module.exports = async (req, res) => {
     if (tx.status === "paid") {
       return res.status(200).json({ id: ref, ref, total: amount, pixCode: tx.pix_copia_cola, expiresAt: tx.expires_at, status: "paid" });
     }
+
+    /* Venda gerada: avisa o Utmify (await porque a função serverless congela após responder) */
+    await sendToUtmify({
+      ref, status: "waiting_payment", total: amount, customer, tracking,
+      ip: (req.headers["x-forwarded-for"] || "").split(",")[0] || undefined
+    });
 
     return res.status(200).json({
       id: ref, ref, total: amount,
