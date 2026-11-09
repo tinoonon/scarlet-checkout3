@@ -145,7 +145,7 @@ function getOrderStatus(id) {
       if (j.status === "paid") {
         o.paidAt = j.paidAt ? Date.parse(j.paidAt) : Date.now();
         saveOrder(o);
-        /* Venda paga: o servidor confirma no gateway e avisa o Utmify */
+        /* Venda paga: o servidor confirma no gateway e avisa o painel e o Utmify */
         fetch("/api/track-paid", { method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
           body: JSON.stringify({ ref: o.ref, shippingId: o.shippingId, customer: o.customer, tracking: getTracking() }) }).catch(function () {});
         return "paid";

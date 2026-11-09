@@ -32,7 +32,7 @@ async function sendToUtmify({ ref, status, total, customer, tracking, createdAt,
       country: "BR",
       ip: ip || undefined
     },
-    products: [{ id: "kit-scarlet", name: process.env.UTMIFY_PRODUCT_NAME || "Kit de aniversário 10 anos Scarlet", planId: null, planName: null, quantity: 1, priceInCents: cents }],
+    products: [{ id: "kit-scarlet-2", name: "Kit de aniversário 10 anos Scarlet", planId: null, planName: null, quantity: 1, priceInCents: cents }],
     trackingParameters: {
       src: str(t.src), sck: str(t.sck), utm_source: str(t.utm_source), utm_campaign: str(t.utm_campaign),
       utm_medium: str(t.utm_medium), utm_content: str(t.utm_content), utm_term: str(t.utm_term)

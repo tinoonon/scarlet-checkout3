@@ -1,4 +1,5 @@
 const { sendToUtmify } = require("./_lib/utmify");
+const { sendToPanel } = require("./_lib/panel");
 const { SUBTOTAL, SHIPPING, REF_RE, profanus, publicBaseUrl, round2 } = require("./_lib/shared");
 
 /* POST /api/pix-create  { ref, shippingId }  ->  { id, ref, total, pixCode, expiresAt, status } */
@@ -48,10 +49,11 @@ module.exports = async (req, res) => {
     }
 
     /* Venda gerada: avisa o Utmify (await porque a função serverless congela após responder) */
-    await sendToUtmify({
-      ref, status: "waiting_payment", total: amount, customer, tracking,
-      ip: (req.headers["x-forwarded-for"] || "").split(",")[0] || undefined
-    });
+    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || undefined;
+    await Promise.all([
+      sendToUtmify({ ref, status: "waiting_payment", total: amount, customer, tracking, ip }),
+      sendToPanel({ event: "order_created", ref, amount, shippingName: ship.name, customer, tracking, ip, userAgent: req.headers["user-agent"] })
+    ]);
 
     return res.status(200).json({
       id: ref, ref, total: amount,

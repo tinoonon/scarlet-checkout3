@@ -1,5 +1,6 @@
 const { REF_RE, SHIPPING, SUBTOTAL, profanus, round2 } = require("./_lib/shared");
 const { sendToUtmify } = require("./_lib/utmify");
+const { sendToPanel } = require("./_lib/panel");
 
 /* POST /api/track-paid { ref, shippingId, customer, tracking }
    Confirma no Profanus que o Pix está pago e só então avisa o Utmify (o Utmify trata orderId repetido como atualização). */
@@ -11,10 +12,12 @@ module.exports = async (req, res) => {
   try {
     const r = await profanus("/api/pix/" + encodeURIComponent(ref));
     if (!r.ok || r.data.status !== "paid") return res.status(200).json({ sent: false });
-    const ok = await sendToUtmify({
-      ref, status: "paid", total: round2(SUBTOTAL + SHIPPING[shippingId].price), customer, tracking,
-      createdAt: r.data.created_at, paidAt: r.data.paid_at, ip: (req.headers["x-forwarded-for"] || "").split(",")[0] || undefined
-    });
+    const total = round2(SUBTOTAL + SHIPPING[shippingId].price);
+    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || undefined;
+    const [ok] = await Promise.all([
+      sendToUtmify({ ref, status: "paid", total, customer, tracking, createdAt: r.data.created_at, paidAt: r.data.paid_at, ip }),
+      sendToPanel({ event: "order_paid", ref, amount: total, shippingName: SHIPPING[shippingId].name, paidAt: r.data.paid_at, customer, tracking, ip, userAgent: req.headers["user-agent"] })
+    ]);
     return res.status(200).json({ sent: ok });
   } catch (e) {
     return res.status(502).json({ error: "falha" });

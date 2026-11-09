@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const { profanus } = require("./_lib/shared");
+const { sendToPanel } = require("./_lib/panel");
 
 /* Precisamos do corpo CRU para validar o HMAC. */
 module.exports.config = { api: { bodyParser: false } };
@@ -38,18 +39,17 @@ module.exports = async (req, res) => {
   try { evt = JSON.parse(raw.toString("utf8")); } catch (e) { return res.status(400).end(); }
 
   if (evt.event === "payment.confirmed" && evt.external_id) {
-    /* Sem segredo configurado a assinatura não vem: confirma direto na API antes de confiar. */
-    let paid = !!secret;
-    if (!paid) {
-      try {
-        const r = await profanus("/api/pix/" + encodeURIComponent(evt.external_id));
-        paid = r.ok && r.data.status === "paid";
-      } catch (e) { return res.status(500).end(); } // 5xx => o Profanus reenvia
-    }
+    /* Sempre confirma na API do Profanus (também traz valor e data reais do pagamento). */
+    let paid = false, tx = null;
+    try {
+      const r = await profanus("/api/pix/" + encodeURIComponent(evt.external_id));
+      tx = r.ok ? r.data : null;
+      paid = !!tx && tx.status === "paid";
+    } catch (e) { return res.status(500).end(); } // 5xx => o Profanus reenvia
     if (paid) {
-      /* PONTO DE GANCHO: aqui entra o que acontece quando o pedido é pago
-         (e-mail, planilha, notificação no WhatsApp...). Deve ser idempotente por external_id. */
-      console.log("pagamento confirmado", evt.external_id, evt.amount);
+      console.log("pagamento confirmado", evt.external_id, tx.amount);
+      /* Atualiza o painel (idempotente por order_ref; o painel mantém cliente e UTMs já salvos). */
+      await sendToPanel({ event: "order_paid", ref: evt.external_id, amount: Number(tx.amount), paidAt: tx.paid_at });
     }
   }
 
